@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <iostream>
-
 #include <sqlite3.h>
 
 struct MenuItemData {
@@ -18,8 +17,24 @@ struct OrderItemData {
     int id;
     int orderId;
     int menuId;
+    std::string name;   // FIX #7: added item name
     int quantity;
-    double price; 
+    double price;       // FIX #2: added price for persistence
+};
+
+// FIX #11: struct to hold a full order loaded from DB
+struct OrderData {
+    int orderId;
+    std::string orderType;
+    std::string status;
+    std::vector<OrderItemData> items;
+};
+
+// FIX #14: struct for billing rules loaded from DB
+struct BillingRulesData {
+    double taxRate;
+    double serviceCharge;
+    double deliveryFee;
 };
 
 class Database {
@@ -27,7 +42,8 @@ private:
     sqlite3* db;
     std::string dbName;
 
-    static int menuCallback(void* data, int argc, char** argv, char** azColName);
+    // FIX #1: helper for schema migration
+    bool columnExists(const std::string& table, const std::string& column);
 
 public:
     Database(const std::string& dbname);
@@ -36,13 +52,17 @@ public:
     bool open();
     void close();
     bool executeQuery(const std::string& sql);
-    
+
     void initialize();
     void seedData();
 
     std::vector<MenuItemData> loadMenu();
-    int insertOrder(const std::string& orderType, const std::string& status);
-    bool insertOrderItem(int orderId, int menuId, int quantity);
+    std::vector<OrderData>    loadActiveOrders();   // FIX #11
+    BillingRulesData          loadBillingRules();   // FIX #14
+
+    int  insertOrder(const std::string& orderType, const std::string& status);
+    bool insertOrderItem(int orderId, int menuId, int quantity,
+                         double price, const std::string& name); // FIX #2,#7
     bool updateOrderStatus(int orderId, const std::string& status);
 };
 

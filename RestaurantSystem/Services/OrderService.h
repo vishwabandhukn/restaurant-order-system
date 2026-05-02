@@ -8,6 +8,9 @@
 #include "../Models/DineInOrder.h"
 #include "../Models/TakeawayOrder.h"
 #include "../Models/DeliveryOrder.h"
+#include "../Models/Appetizer.h"
+#include "../Models/Beverage.h"
+#include "../Models/MainCourse.h"
 
 class OrderService {
 private:
@@ -16,11 +19,13 @@ private:
 
 public:
     OrderService(Database* database);
-    
+
     Order* createOrder(int typeChoice);
-    bool addItemToOrder(Order* order, int menuId, int quantity, double price);
+    // FIX #7: added name parameter
+    bool addItemToOrder(Order* order, int menuId, int quantity,
+                        double price, const std::string& name);
     bool advanceOrderStatus(Order* order);
-    
+
     const std::vector<std::unique_ptr<Order>>& getActiveOrders() const;
     void showMenu(const std::vector<MenuItemData>& menu);
 };

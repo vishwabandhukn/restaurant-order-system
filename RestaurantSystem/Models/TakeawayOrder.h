@@ -17,7 +17,7 @@ public:
     }
 
     std::string getExtraChargesDetail() const override {
-        return "None";
+        return ""; // No extra charges for takeaway
     }
 };
 
